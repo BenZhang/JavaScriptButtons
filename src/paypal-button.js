@@ -32,7 +32,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			},
 			es_ES: {
 				buynow: 'Comporar ahora',
-				cart: 'Añadir al carro'
+				cart: 'A&ntilde;adir al carro'
 			},
 			fr_FR: {
 				buynow: 'Acheter',
