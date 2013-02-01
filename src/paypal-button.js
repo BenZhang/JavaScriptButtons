@@ -338,7 +338,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		}
 
 		return function (attr) {
-			var elems = document.body.getElementsByTagName('a*'),
+			var elems = document.body.getElementsByTagName('button'),
 				match = [],
 				elem, i;
 
