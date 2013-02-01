@@ -1,3 +1,4 @@
+/*global document:true, module:true, ButtonFactory:true */
 if (typeof PAYPAL === 'undefined' || !PAYPAL) {
 	var PAYPAL = {};
 }
@@ -8,7 +9,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 (function () {
 
 	'use strict';
-
 
 	var app = {},
 		paypalURL = 'https://www.paypal.com/cgi-bin/webscr',
@@ -59,8 +59,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param parent {HTMLElement} The element to add the button to (Optional)
 		 * @return {HTMLElement}
 		 */
-		app.create = function (business, raw, type, parent) {
-			var data = new DataStore(), button, key;
+		app.create = function (business, raw, type, el) {
+			var data = new DataStore(), button, key, parent;
 
 			if (!business) { return false; }
 
@@ -101,8 +101,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.buttons[type] += 1;
 
 			// Add it to the DOM
-			if (parent) {
-				parent.appendChild(button);
+			if ((parent = el.parentNode)) {
+				parent.replaceChild(button, el);
 			}
 
 			return button;
@@ -256,7 +256,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 		return dataset;
 	}
 
-
 	/**
 	 * A storage object to create structured methods around a button's data
 	 */
@@ -275,28 +274,107 @@ PAYPAL.apps = PAYPAL.apps || {};
 			delete this.items[key];
 		};
 	}
+	
+	
+	function getButtons() {
+		var slice;
 
+		if (document.querySelectorAll) {
+			slice = Array.prototype.slice;
+			return function (attr) {
+				return slice.call(document.body.querySelectorAll('[data-paypal]'));
+			};
+		}
 
-	// Init the buttons
-	if (typeof document !== 'undefined') {
-		var ButtonFactory = PAYPAL.apps.ButtonFactory,
-			nodes = document.getElementsByTagName('script'),
+		return function (attr) {
+			var elems = document.body.getElementsByTagName('a*'),
+				match = [],
+				elem, i;
+
+			for (i = elems.length - 1; i > -1; i--) {
+				elem = elems[i];
+				// Non-existent attributes generally return empty string ('') or null,
+				// so their falsy-ness suffices in this case.
+				if (elem.getAttribute(attr)) {
+					match.push(elems);
+				}
+			}
+
+			return match;
+		};
+	}
+	
+	/**
+	 * Gets all elements w/ data-paypal attributes
+	 *
+	 * @param type {String} The data-paypal value to match against
+	 * @return {NodeList}
+	 */
+	function getButtonsByType(type){
+		var nodes = [],
+			attr = "data-paypal",
+			value;
+		
+		function getButton(node, fn) {     
+			fn(node);
+			node = node.firstChild;
+		
+			while (node) {         
+				getButton(node, fn);         
+				node = node.nextSibling;     
+			}
+		}
+		
+		getButton(document.body, function(n) { 
+			if (n.nodeType === 1 && (value = n.getAttribute(attr))) {
+				if (value === type) {
+					nodes.push(n);	
+				}
+			}
+		});
+		
+		return nodes;
+	}
+
+	/**
+	 * Grab the merchant's ID off of the <script> snippet
+	 *
+	 * @param
+	 * @return {String}
+	 */
+	function getMerchantId() {
+		var nodes = document.getElementsByTagName('script'),
 			node, data, type, business, i, len;
 
 		for (i = 0, len = nodes.length; i < len; i++) {
 			node = nodes[i];
 
 			if (!node || !node.src) { continue; }
-
-			data = node && getDataSet(node);
-			type = data && data.button && data.button.value;
+			
 			business = node.src.split('?merchant=')[1];
+			break;
+		}
+		
+		return business;
+	}
 
-			if (business) {
-				ButtonFactory.create(business, data, type, node.parentNode);
 
-				// Clean up
-				node.parentNode.removeChild(node);
+	// Find paypal button elements, find merchant ID, and then initialize buttons
+	if (typeof document !== 'undefined') {
+		
+		var ButtonFactory = PAYPAL.apps.ButtonFactory,
+			buttons = getButtonsByType('checkout'),
+			merchantId = getMerchantId(),
+			button, data, type, i, len;
+		
+		for (i = 0, len = buttons.length; i < len; i++) {
+			button = buttons[i];
+
+			data = button && getDataSet(button);
+			type = data && data.button && data.button.value;
+			
+			if (merchantId) {
+				ButtonFactory.create(merchantId, data, type, button);
 			}
 		}
 	}
