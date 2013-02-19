@@ -1,18 +1,37 @@
 ## PayPal Payment Buttons [![Build Status](https://travis-ci.org/paypal/JavaScriptButtons.png?branch=master)](https://travis-ci.org/paypal/JavaScriptButtons)
 
-Unofficial PayPal HTML payment buttons that are as easy as including a snippet of code. [Try it out and configure your own](http://paypal.github.com/JavaScriptButtons/).
+Unofficial PayPal JavaScript payment buttons that are as easy as including a snippet of code. [Try it out and configure your own](http://paypal.github.com/JavaScriptButtons/).
 
+### PayPal Button SDK
+To use any of the buttons below, paste this snippet into your page.  At the top of the snippet, replace "YOUR_MERCHANT_ID" with your Merchant ID.  This will load the PayPal Button SDK asynchronously so it does not block loading other elements on your page.
+
+```html
+<script>
+	(function(d, s, id){
+		var merchantId = "YOUR_MERCHANT_ID",
+			ref = d.getElementsByTagName(s)[0],
+			js;
+			
+		if (!d.getElementById(id)) {
+			js = d.createElement(s); js.id = id; js.async = true;
+			js.src = "../src/paypal-button.js?merchant=" + merchantId;
+			ref.parentNode.insertBefore(js, ref);
+		}
+	}(document, "script", "paypal-js"));
+</script>
+```
+    
 We have a few flavors of buttons for you to use:
 
 ### Buy Now
 Buy Now buttons are for single item purchases.
 
 ```html
-<script src="paypal-button.min.js?merchant=YOUR_MERCHANT_ID"
+<button data-paypal="checkout"
     data-button="buynow"
     data-name="My product"
-    data-amount="1.00"
-></script>
+	data-amount="1.00"
+></button>
 ```
 
 
@@ -20,21 +39,21 @@ Buy Now buttons are for single item purchases.
 Add To Cart buttons lets users add multiple items to their PayPal cart.
 
 ```html
-<script src="paypal-button-minicart.min.js?merchant=YOUR_MERCHANT_ID"
+<button data-paypal="checkout"
     data-button="cart"
     data-name="Product in your cart"
     data-amount="1.00"
-></script>
+></button>
 ```
 
 ### Hosted 
 Hosted buttons help tamper-proof your button's data. 
 
 ```html
-<script src="paypal-button-minicart.min.js?merchant=YOUR_MERCHANT_ID"
+<button data-paypal="checkout"
     data-button="buynow"
     data-id="YOUR_BUTTON_ID"
-></script>
+></button>
 ```
 
 *Note: Hosted buttons IDs must be created on PayPal.com or via the Button Manager APIs using your credentials.*
@@ -43,13 +62,11 @@ Hosted buttons help tamper-proof your button's data.
 QR codes which can be scanned with a smart phone can also be easily generated.
 
 ```html
-<script src="paypal-button.min.js?merchant=YOUR_MERCHANT_ID"
-    data-button="qr"
+<button data-paypal="checkout"
     data-name="Product via QR code"
     data-amount="1.00"
-></script>
+></button>
 ```
-
 
 ## Button variables
 All of PayPal's [HTML button variables](https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_html_Appx_websitestandard_htmlvariables) are supported by prefixing their name with "data-". Here are the most commonly used:
@@ -107,7 +124,7 @@ The JavaScript buttons have been tested and work in all modern browsers includin
 
 
 ## Getting your Merchant ID
-Your merchant ID needs to be added to the URL of the referenced script. This ID can either be your Secure Merchant ID, which can be found by logging into your PayPal account and visiting your profile, or your email address.
+Your merchant ID needs to be added to the top of the referenced script. This ID can either be your Secure Merchant ID, which can be found by logging into your PayPal account and visiting your profile, or your email address.
 
 
 ## Contributing 
