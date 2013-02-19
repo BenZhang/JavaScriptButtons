@@ -127,11 +127,14 @@
 	</div>
 	
 	<script>
-		(function(d, s, id){ 
-			var js, ref = d.getElementsByTagName(s)[0];
+		(function(d, s, id){
+			var merchantId = "6XF3MPZBZV6HU",
+				ref = d.getElementsByTagName(s)[0],
+				js;
+
 			if (!d.getElementById(id)) {
 				js = d.createElement(s); js.id = id; js.async = true;
-				js.src = "../src/paypal-button.js?merchant=6XF3MPZBZV6HU";
+				js.src = "../src/paypal-button.js?merchant=" + merchantId;
 				ref.parentNode.insertBefore(js, ref);
 			}
 		}(document, "script", "paypal-js"));

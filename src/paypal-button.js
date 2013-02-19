@@ -1,4 +1,4 @@
-/*global document:true, module:true, ButtonFactory:true */
+/*global document:true, module:true */
 if (typeof PAYPAL === 'undefined' || !PAYPAL) {
 	var PAYPAL = {};
 }
@@ -185,7 +185,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 		size = items.size ? items.size.value : "large";
 		locale = items.lc ? items.lc.value : "en_US";
 
-		//btn.src = getButtonImg(type, size, locale);
 		btn.className = "paypal-button " + size;
 		btn.innerHTML = buttonText[locale][items.button.value];
 		
